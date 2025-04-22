@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Banco Fembyte</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f0f0f0;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 30px; /* Aumentar separación entre elementos */
+            overflow: hidden;
+        }
+        
+        .container {
+            position: relative;
+            width: 100%;
+            max-width: 400px;
+            height: 85vh;
+            display: flex;
+            flex-direction: column;
+            border-radius: 25px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+        
+        /* Animación de inicio */
+        .splash-screen {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background-color: #4a86e8; /* Cambiado de #c2ff00 a azul */
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+            animation: fadeOut 1s ease-in-out 2s forwards;
+            overflow: hidden;
+        }
+        
+        .splash-logo {
+            font-size: 32px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 20px;
+            animation: popIn 0.5s ease-out;
+        }
+        
+        .splash-icon {
+            width: 100px;
+            height: 100px;
+            background-color: #333;
+            border-radius: 50%;
+            position: relative;
+            animation: expand 0.8s ease-out 0.5s forwards;
+        }
+        
+        .splash-icon:before {
+            content: "F";
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: #4a86e8; /* Cambiado de #c2ff00 a azul */
+            font-size: 60px;
+            font-weight: bold;
+        }
+        
+        /* Animaciones */
+        @keyframes fadeOut {
+            from { opacity: 1; }
+            to { 
+                opacity: 0; 
+                display: none;
+                z-index: -1;
+            }
+        }
+        
+        @keyframes popIn {
+            0% { transform: scale(0); opacity: 0; }
+            80% { transform: scale(1.2); opacity: 1; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        
+        @keyframes expand {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.3); }
+            100% { transform: scale(1); }
+        }
+        
+        /* Aplicación principal */
+        .app-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: white;
+        }
+        
+        .header {
+            padding: 20px;
+            background-color: #4a86e8; /* Cambiado de #c2ff00 a azul */
+            color: #fff; /* Cambiado de #333 a blanco para mejor contraste */
+            text-align: center;
+            position: relative;
+            border-bottom-left-radius: 20px;
+            border-bottom-right-radius: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        
+        .balance-container {
+            background-color: rgba(255, 255, 255, 0.2);
+            padding: 10px;
+            border-radius: 10px;
+            margin-top: 10px;
+        }
+        
+        .balance-label {
+            font-size: 14px;
+            opacity: 0.8;
+        }
+        
+        .balance {
+            font-size: 28px;
+            font-weight: bold;
+        }
+        
+        .chroma-key {
+            flex: 1;
+            margin: 20px;
+            background-color: #c2ff00;
+            border-radius: 20px;
+            overflow: hidden;
+            position: relative;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        /* Controles */
+        .controls-container {
+            width: 100%;
+            max-width: 350px;
+            padding: 20px;
+            background-color: white;
+            border-radius: 25px;
+            margin-left: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            height: 85vh;
+            overflow-y: auto;
+        }
+        
+        .controls-header {
+            text-align: center;
+            margin-bottom: 20px;
+            font-weight: bold;
+            color: #333;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        .control-label {
+            display: block;
+            margin-bottom: 5px;
+            color: #555;
+            font-size: 14px;
+        }
+        
+        .control-input, .control-select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+        }
+        
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        .control-button {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            background-color: #4a86e8; /* Cambiado de #c2ff00 a azul */
+            color: #fff; /* Cambiado a blanco para mejor contraste */
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .control-button:hover {
+            background-color: #3a76d8; /* Versión más oscura del azul */
+            transform: translateY(-2px);
+        }
+        
+        .control-button:active {
+            transform: translateY(1px);
+        }
+        
+        /* Estilos para el toggle switch */
+        .toggle-container {
+            position: relative;
+            display: inline-block;
+            width: 60px;
+            height: 30px;
+        }
+        
+        .toggle-input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        
+        .toggle-label {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 34px;
+        }
+        
+        .toggle-label:before {
+            position: absolute;
+            content: "";
+            height: 22px;
+            width: 22px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        
+        .toggle-input:checked + .toggle-label {
+            background-color: #4a86e8;
+        }
+        
+        .toggle-input:checked + .toggle-label:before {
+            transform: translateX(30px);
+        }
+        
+        /* Notificación */
+        .notification {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            transform: translateX(100%);
+            background-color: rgba(255, 255, 255, 0.9);
+            padding: 15px 25px;
+            border-radius: 10px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+            z-index: 100;
+            transition: transform 0.5s ease;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            opacity: 0; /* Inicialmente oculta */
+        }
+        
+        .notification.show {
+            transform: translateX(0);
+        }
+        
+        .notification-title {
+            font-weight: bold;
+            color: #333;
+        }
+        
+        .notification-amount {
+            font-size: 18px;
+            font-weight: bold;
+        }
+        
+        .notification-amount.deposit {
+            color: #28a745;
+        }
+        
+        .notification-amount.withdrawal {
+            color: #dc3545;
+        }
+        
+        .notification-concept {
+            font-size: 12px;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Pantalla de inicio -->
+        <div class="splash-screen">
+            <div class="splash-logo">Banco Fembyte</div>
+            <div class="splash-icon"></div>
+        </div>
+        
+        <!-- Aplicación principal -->
+        <div class="app-container">
+            <div class="header">
+                <div class="logo">Banco Fembyte</div>
+                <div class="balance-container">
+                    <div class="balance-label">Tu saldo actual</div>
+                    <div class="balance" id="balanceAmount">$0.00</div>
+                </div>
+            </div>
+            
+            <div class="chroma-key" id="chromaKey"></div>
+
+            <!-- Notificación -->
+            <div class="notification" id="notification">
+                <div class="notification-title" id="notificationTitle">Depósito realizado</div>
+                <div class="notification-amount" id="notificationAmount">$1,000.00</div>
+                <div class="notification-concept" id="notificationConcept">Concepto: Pago de nómina</div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Controles separados -->
+    <div class="controls-container">
+        <div class="controls-header">Controles</div>
+        <div class="form-group">
+            <label class="control-label" for="transactionType">Tipo de transacción</label>
+            <select class="control-select" id="transactionType">
+                <option value="deposit">Depósito</option>
+                <option value="withdrawal">Retiro</option>
+                <option value="payment">Pago</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label class="control-label" for="transactionConcept">Concepto</label>
+            <input type="text" class="control-input" id="transactionConcept" placeholder="Ej: Pago de nómina">
+        </div>
+        <div class="form-group">
+            <label class="control-label" for="transactionAmount">Cantidad</label>
+            <input type="number" class="control-input" id="transactionAmount" placeholder="0.00" min="0">
+        </div>
+        <div class="form-group">
+            <label class="control-label" for="chromaColor">Color del Chroma Key</label>
+            <input type="color" class="control-input" id="chromaColor" value="#c2ff00">
+        </div>
+        <div class="form-group">
+            <label class="control-label" for="showChromaText">Mostrar leyenda en Chroma Key</label>
+            <div class="toggle-container">
+                <input type="checkbox" id="showChromaText" class="toggle-input" checked>
+                <label for="showChromaText" class="toggle-label"></label>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="control-label" for="currencyType">Tipo de moneda</label>
+            <select class="control-select" id="currencyType">
+                <option value="USD">USD (Dólar)</option>
+                <option value="MXN">MXN (Peso Mexicano)</option>
+            </select>
+        </div>
+        <div class="button-group">
+            <button class="control-button" id="resetButton">Reiniciar</button>
+            <button class="control-button" id="submitButton">Aplicar</button>
+        </div>
+    </div>
+
+    <script>
+        // Elementos del DOM
+        const balanceElement = document.getElementById('balanceAmount');
+        const notification = document.getElementById('notification');
+        const notificationTitle = document.getElementById('notificationTitle');
+        const notificationAmount = document.getElementById('notificationAmount');
+        const notificationConcept = document.getElementById('notificationConcept');
+        const submitButton = document.getElementById('submitButton');
+        const resetButton = document.getElementById('resetButton');
+        const chromaKey = document.getElementById('chromaKey');
+        const chromaColorInput = document.getElementById('chromaColor');
+        
+        // Variables globales
+        let currentBalance = 0; // Saldo inicial en números para cálculos
+        let currentCurrency = "USD"; // Moneda por defecto
+        let showChromaText = true; // Mostrar texto en chroma key por defecto
+        
+        /**
+         * Formatea un número a formato de moneda
+         * @param {number} amount - Cantidad a formatear
+         * @return {string} - Cantidad formateada
+         */
+        function formatCurrency(amount) {
+            const symbol = currentCurrency === "USD" ? "$" : "$";
+            const exchangeRate = currentCurrency === "USD" ? 1 : 17.5; // Tasa de cambio aproximada USD a MXN
+            const convertedAmount = amount * (currentCurrency === "USD" ? 1 : exchangeRate);
+            return symbol + convertedAmount.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,') + (currentCurrency === "USD" ? " USD" : " MXN");
+        }
+        
+        /**
+         * Actualiza el saldo en la interfaz
+         * @param {number} newBalance - Nuevo saldo a mostrar
+         */
+        function updateBalance(newBalance) {
+            currentBalance = newBalance;
+            balanceElement.textContent = formatCurrency(currentBalance);
+            
+            // Animación simple
+            balanceElement.style.transform = 'scale(1.1)';
+            setTimeout(() => {
+                balanceElement.style.transform = 'scale(1)';
+            }, 200);
+        }
+        
+        /**
+         * Muestra una notificación y reproduce un sonido
+         * @param {string} title - Título de la notificación
+         * @param {number} amount - Cantidad
+         * @param {string} concept - Concepto de la transacción
+         * @param {string} type - Tipo de transacción (deposit, withdrawal)
+         */
+        function showNotification(title, amount, concept, type) {
+            notificationTitle.textContent = title;
+            notificationAmount.textContent = formatCurrency(amount);
+            notificationConcept.textContent = 'Concepto: ' + concept;
+            
+            // Aplicar clase según tipo
+            notificationAmount.className = 'notification-amount';
+            if (type) {
+                notificationAmount.classList.add(type);
+            }
+            
+            // Reproducir sonido de notificación
+            const notificationSound = new Audio('audio.mp3');
+            notificationSound.play();
+            
+            // Mostrar y ocultar después de un tiempo
+            notification.classList.add('show');
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
+        }
+        
+        /**
+         * Procesa una transacción
+         */
+        function processTransaction() {
+            const transactionType = document.getElementById('transactionType').value;
+            const concept = document.getElementById('transactionConcept').value || 'Sin concepto';
+            const amountInput = document.getElementById('transactionAmount').value;
+            
+            if (!amountInput || isNaN(amountInput) || parseFloat(amountInput) <= 0) {
+                alert('Por favor, ingresa una cantidad válida');
+                return;
+            }
+            
+            const amount = parseFloat(amountInput);
+            let newBalance = currentBalance;
+            let title = '';
+            let type = '';
+            
+            switch(transactionType) {
+                case 'deposit':
+                    newBalance += amount;
+                    title = 'Depósito realizado';
+                    type = 'deposit';
+                    break;
+                case 'withdrawal':
+                    if (amount > currentBalance) {
+                        alert('Saldo insuficiente');
+                        return;
+                    }
+                    newBalance -= amount;
+                    title = 'Retiro realizado';
+                    type = 'withdrawal';
+                    break;
+                case 'payment':
+                    if (amount > currentBalance) {
+                        alert('Saldo insuficiente');
+                        return;
+                    }
+                    newBalance -= amount;
+                    title = 'Pago realizado';
+                    type = 'withdrawal';
+                    break;
+            }
+            
+            // Actualizar saldo y mostrar notificación
+            updateBalance(newBalance);
+            showNotification(title, amount, concept, type);
+            
+            // Limpiar campos
+            document.getElementById('transactionConcept').value = '';
+            document.getElementById('transactionAmount').value = '';
+        }
+        
+        /**
+         * Reinicia la aplicación
+         */
+        function resetApp() {
+            // Reiniciar saldo
+            updateBalance(0);
+            
+            // Ocultar notificación si está visible
+            notification.classList.remove('show');
+            
+            // Recrear y mostrar la pantalla de inicio
+            const appContainer = document.querySelector('.app-container');
+            const splashScreen = document.querySelector('.splash-screen');
+            
+            // Ocultar la aplicación principal
+            appContainer.style.opacity = '0';
+            
+            // Reiniciar la animación de inicio
+            splashScreen.style.opacity = '1';
+            splashScreen.style.zIndex = '100';
+            splashScreen.style.display = 'flex';
+            splashScreen.style.animation = 'none';
+            
+            // Forzar un reflow para reiniciar la animación
+            void splashScreen.offsetWidth;
+            
+            // Reiniciar la animación
+            splashScreen.style.animation = 'fadeOut 1s ease-in-out 2s forwards';
+            
+            // Mostrar la aplicación principal después de la animación
+            setTimeout(() => {
+                appContainer.style.opacity = '1';
+                showNotification('Su saldo actual', 0, 'Banco Fembyte', null);
+                
+                // Reiniciar el chroma key
+                initChromaKey();
+            }, 3000);
+        }
+        
+        // Evento para botón de enviar
+        submitButton.addEventListener('click', processTransaction);
+        
+        // Evento para botón de reiniciar
+        resetButton.addEventListener('click', resetApp);
+        
+        // Simular acceso a la cámara (solo visual)
+        function initChromaKey() {
+            updateChromaKeyColor();
+            updateChromaKeyText();
+        }
+        
+        // Función para actualizar el texto del chroma key
+        function updateChromaKeyText() {
+            if (showChromaText) {
+                chromaKey.innerHTML = `
+                    <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center;">
+                        <div style="font-size: 32px; margin-bottom: 10px;">📷</div>
+                        <div style="color: #333;">Área de chroma key</div>
+                        <div style="color: #666; font-size: 12px; margin-top: 5px;">Aquí se mostraría el usuario</div>
+                    </div>
+                `;
+            } else {
+                chromaKey.innerHTML = '';
+            }
+        }
+        
+        // Función para actualizar el color del chroma key
+        function updateChromaKeyColor() {
+            const color = chromaColorInput.value;
+            chromaKey.style.backgroundColor = color;
+        }
+        
+        // Evento para cambiar el color del chroma key
+        chromaColorInput.addEventListener('input', updateChromaKeyColor);
+        
+        // Evento para mostrar/ocultar texto en chroma key
+        document.getElementById('showChromaText').addEventListener('change', function() {
+            showChromaText = this.checked;
+            updateChromaKeyText();
+        });
+        
+        // Evento para cambiar el tipo de moneda
+        document.getElementById('currencyType').addEventListener('change', function() {
+            currentCurrency = this.value;
+            updateBalance(currentBalance); // Actualizar el formato de la moneda
+        });
+        
+        // Inicializar área de chroma key después de la animación de inicio
+        setTimeout(initChromaKey, 3000);
+        
+        // Ocultar notificación durante la pantalla de inicio
+        setTimeout(() => {
+            notification.style.opacity = 1; // Hacer visible después de la animación de inicio
+        }, 3000);
+    </script>
+</body>
+</html>
